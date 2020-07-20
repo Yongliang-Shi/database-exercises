@@ -1,1 +1,1 @@
-This will be where you do all of your work at codeup.
+This will be where I will become a Data Scientist
