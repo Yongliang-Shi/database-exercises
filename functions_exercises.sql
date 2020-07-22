@@ -17,20 +17,26 @@ and first_name like 'E%E';
 -- Q4: For your query of employees born on Christmas and hired in the 90s
 --- use datediff() to find how many days they have been working at the company 
 -- (Hint: You will also need to use NOW() or CURDATE())
-select concat (first_name, ' ', last_name) as full_name, hire_date, datediff(curdate(), hire_date) as working_days
+select concat (first_name, ' ', last_name) as full_name, hire_date, datediff(curdate(), hire_date) as days_employeed
 from employees
 where hire_date between '1990-01-01' and '1999-12-31'
 and birth_date like '%-12-25'
-order by working_days;
--- output: 362 rows affected. min(working_days) = 7630
+order by days_employeed;
+-- output: 362 rows affected. min(days_employeed) = 7630
 -- NOW() gives the same output
-select concat (first_name, ' ', last_name) as full_name, hire_date, datediff(now(), hire_date) as working_days
+select concat (first_name, ' ', last_name) as full_name, hire_date, datediff(now(), hire_date) as days_employeed
 from employees
 where hire_date between '1990-01-01' and '1999-12-31'
 and birth_date like '%-12-25'
-order by working_days;
--- output: 362 rows affected. min(working_days) = 7630
+order by days_employeed;
+-- output: 362 rows affected. min(days_employeed) = 7630
 -- ? operator - give wrong output, why? 
+-- You also can output years_employeed
+select concat (first_name, ' ', last_name) as full_name, hire_date, datediff(now(), hire_date)/365 as years_employeed
+from employees
+where hire_date between '1990-01-01' and '1999-12-31'
+and birth_date like '%-12-25'
+order by years_employeed;
 
 
 -- Q5: Find the smallest and largest salary from the salaries table.
@@ -48,3 +54,17 @@ limit 10;
 -- output: same as the example
 -- ? Is this the way how to generate the username? 
 -- ? Is there a better way?
+    -- Better breakdown
+    -- MONTH (birth_date)
+    -- YEAR (birth_date)
+select concat(
+            lower(
+                substr(first_name,1,1)),
+                lower(substr(last_name,1,4)),
+                '_',
+                substr(birth_date,6,2),
+                substr(birth_date,3,2)) 
+        as username, 
+        first_name, last_name, birth_date
+from employees
+limit 10; 
