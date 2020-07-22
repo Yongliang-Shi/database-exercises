@@ -50,13 +50,15 @@ group by last_name;
 select last_name, count(last_name) as shared_time
 from employees
 where last_name like 'E%E'
-group by last_name;
+group by last_name
+order by shared_time desc;
 
 select last_name, count(last_name) as shared_time
 from employees
 where last_name like '%q%'
 and last_name not like '%qu%'
-group by last_name;
+group by last_name
+order by shared_time desc;
 
 -- Q7: Update your query for 'Irena', 'Vidya', or 'Maya'. 
 -- Use COUNT(*) and GROUP BY to find the number of employees for each gender with those names. 
