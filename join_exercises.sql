@@ -131,6 +131,7 @@ and salaries.to_date > curdate()
 group by dept_name
 order by average_salary desc
 limit 1; 
+--Review: you can also group by departments.dept_no
 
 -- Q8: Who is the highest paid employee in the Marketing department?
 select first_name, last_name
@@ -162,8 +163,9 @@ limit 1;
 
 -- Q10: Bouns
 -- Find the names of all current employees, their department name, and their current manager's name
-
-select concat(employees.first_name, ' ', employees.last_name) as 'Employee Name', dept_name as 'Department Name', dept_manager.emp_no
+select concat(employees.first_name, ' ', employees.last_name) as 'Employee Name', 
+        dept_name as 'Department Name', 
+        dept_manager.emp_no
 from dept_emp
 join employees
     on dept_emp.emp_no = employees.emp_no
@@ -174,18 +176,115 @@ right join dept_manager
 where dept_emp.to_date > curdate()
 and dept_manager.to_date > curdate();
 
+-- My original code is so close to the right answer, just need to add another join 
+
+use employees;
+select concat(employees.first_name, ' ', employees.last_name) as 'Employee Name', 
+        dept_name as 'Department Name', 
+        concat (ee.first_name, ' ', ee.last_name) as 'Manager Name'
+from dept_emp
+join employees     on dept_emp.emp_no = employees.emp_no
+join departments
+    on dept_emp.dept_no = departments.dept_no
+right join dept_manager
+	on dept_emp.dept_no = dept_manager.dept_no
+join employees as ee on dept_manager.emp_no = ee.emp_no
+where dept_emp.to_date > curdate()
+and dept_manager.to_date > curdate();
+-- Output: same as the results
+
+-- REVIEW:  
+-- In DB Language:
+-- 1. get all employees who are currently in a department
+select *
+from dept_emp
+where to_date > curdate();
+-- count is correct and just need to add more information
+select de.emp_no, de.dept_no
+from dept_emp de
+where to_date > curdate();
+
+-- 2. and get their name (employees)
+select de.emp_no, e.emp_no, de.dept_no, e.first_name, e.last_name
+from dept_emp de
+join employees as e on de.emp_no = e.emp_no
+where to_date > curdate();
+-- same number of rows, just add more info
+
+-- 3. and get their department anme
+select de.emp_no, de.dept_no, de.dept_no, e.first_name, e.last_name d.dept_name
+from dept_emp de
+join employees as e on de.emp_no = e.emp_no
+join departments as d on de.dept_no = d.dept_no
+where to_date > curdate()
+order by emp_no;
+
+-- 4. and add the current mamager of each department (previous problem)
+select dm.emp_no, dm.dept_no
+from dept_manager dm
+where dm.to_date > curdate();
+
+-- 5. tie the manager's departments with employees department
+select de.emp_no, de.dept_no, de.dept_no, e.first_name, e.last_name d.dept_name, dm.emp_no as mgr_emp_no
+from dept_emp de
+join employees as e on de.emp_no = e.emp_no
+join departments as d on de.dept_no = d.dept_no
+join dept_manager as dm on de.dept_no = dm.dept_no and dm.to_date > curdate();
+where to_date > curdate()
+order by emp_no;
+
+-- 6. get managers name by joining manager em
+
+select de.emp_no, de.dept_no, de.dept_no, e.first_name, 
+        e.last_name d.dept_name, dm.emp_no, ee.first_name as mgr_first, 
+        ee.last_name as mgr_last
+from dept_emp de
+join employees as e on de.emp_no = e.emp_no
+join departments as d on de.dept_no = d.dept_no
+join dept_manager as dm on de.dept_no = dm.dept_no and dm.to_date > curdate();
+join employees as ee on dm.emp_no = ee.emp_no
+where to_date > curdate()
+order by emp_no;
+
+-- 7. clean it up to make it look as requested
+
+select concat (e.first_name, ' ', e.last_name) as 'Employee Name', 
+				d.dept_name as 'Department Name', 
+				concat (ee.first_name, ' ', ee.last_name) as 'Manager Name'
+from dept_emp de
+join employees as e on de.emp_no = e.emp_no
+join departments as d on de.dept_no = d.dept_no
+join dept_manager as dm on de.dept_no = dm.dept_no and dm.to_date > curdate()
+join employees as ee on dm.emp_no = ee.emp_no
+where de.to_date > curdate();
+
 -- Q11: Bonus Find the highest paid employee in each department.
 -- update of Q8
 
-select *
-from departments
-join dept_emp 
-    on departments.dept_no = dept_emp.dept_no
-join salaries
-    on dept_emp.emp_no = salaries.emp_no
-where dept_emp.to_date > curdate()
-and salaries.to_date > curdate()
+select max(sa.salary)
+from salaries as sa
+join dept_emp as de on sa.emp_no = de.emp_no
+where de.to_date > curdate()
+and sa.to_date > curdate()
+group by dept_no
+order by max(sa.salary) desc;
 
+select e.first_name, e.last_name, departments.dept_name, salaries.salary
+from salaries
+join employees as e on salaries.emp_no = e.emp_no
+join dept_emp on salaries.emp_no = dept_emp.emp_no
+join departments on dept_emp.dept_no = departments.dept_no
+where salary in (
+	select max(sa.salary)
+	from salaries as sa
+	join dept_emp as de on sa.emp_no = de.emp_no
+	where de.to_date > curdate()
+	and sa.to_date > curdate()
+	group by dept_no
+)
+and salaries.to_date > curdate()
+and dept_emp.to_date > curdate()
+order by dept_name
 
 
 
