@@ -23,6 +23,8 @@ set full_name = concat (first_name, ' ', last_name);
 select *
 from employees_with_departments;
 
+-- Instructor did the 'another way' in Q1_d
+
 -- Q1_c. Remove the first_name and last_name columns from the table.
 
 alter table employees_with_departments drop column first_name;
@@ -62,6 +64,16 @@ alter table payment drop column amount;
 select * from
 payment;
 -- Could I alter the data type of a column?
+-- Yes, that is how the instructor did
+alter table payment modify amount_cent int unsigned;
+-- Issue: automatic rounding
+
+-- Another approach doesn't have automatic rounding == pennies coloum becomes a 8,2 decimal
+create temporary table payments as
+select *, amount * 100 as pennies
+from sakila.payment;
+-- Then make the data type change
+-- Keep the original column, if you can
 
 --Q3: Find out how the average pay in each department compares to the overall average pay. 
 -- In order to make the comparison easier, you should use the Z-score for salaries. 
@@ -80,6 +92,7 @@ group by dep.dept_name;
 
 alter table department_average_pay add ovrall_avg decimal(9,4);
 alter table department_average_pay add ovrall_std decimal(9,4);
+-- The data type can be FLOAT
 
 select *
 from department_average_pay;
@@ -122,15 +135,19 @@ from overall_std_pay
 select *
 from department_average_pay;
 
+-- Instructor used 1 temporary talbe, which combined the two I had above
+-- Instructor used simple alias: 'mean' and 'sd'
+
 -- Step 4: add a new column salary_z_score and calculate the value
 -- alter table department_average_pay drop column salary_z_sore;
-alter table department_average_pay add salary_z_sore decimal(7,7);
+alter table department_average_pay add salary_z_sore decimal(6,6);
+-- Instructor added all three columns at once. 
 
 update department_average_pay
 set salary_z_sore = (dep_avg_sa - ovrall_avg) / ovrall_std;
 
-select * 
-from overall_std_pay;
+select *
+from department_average_pay;
 
 -- Best department: Sales
 -- Worst department: Human Resources
