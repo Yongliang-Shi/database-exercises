@@ -92,3 +92,84 @@ on dm_sa.emp_no = ee.emp_no
 join departments as dep
 on avg_sa.dept_no = dep.dept_no
 order by dep.dept_name
+
+-- World Database
+-- What languages are spoken in Santa Monica?
+select Language, Percentage
+from city
+join countrylanguage as cl on city.countrycode = cl.countrycode
+where name = 'Santa Monica'
+order by percentage;
+
+-- How many different countries are in each region?
+select Region, count(name) as num_countries
+from country
+group by Region
+order by num_countries;
+
+-- What is the population for each region?
+select Region, sum(population) as population
+from country
+group by Region
+order by population desc;
+
+-- What is the population for each continent?
+select Continent, sum(population) as population
+from country
+group by Continent
+order by population desc;
+
+-- What is the average life expectancy globally?
+select avg(LifeExpectancy)
+from country;
+
+-- What is the average life expectancy for each region, each continent? Sort the results from shortest to longest
+select Continent, avg(LifeExpectancy) as life_expectancy 
+from country
+group by Continent
+order by life_expectancy;
+
+select Region, avg(LifeExpectancy) as life_expectancy 
+from country
+group by Region
+order by life_expectancy;
+
+-- Bonus
+-- Find all the countries whose local name is different from the official name
+ select Name, LocalName
+ from country
+ where Name != LocalName
+ order by Name;
+
+--  How many countries have a life expectancy less than x?
+-- Assume x = 65
+select count(Name)
+from country
+where LifeExpectancy > 65;
+
+-- What state is city x located in?
+-- Assume city x = San Antonio
+select Name, District as State 
+from city
+where Name = 'San Antonio'
+
+-- What region of the world is city x located in?
+-- Assume city x = San Antonio
+select city.name as city_name, country.name, region
+from city
+join country on city.countrycode = country.code
+where city.name like 'San Antonio';
+
+-- What country (use the human readable name) city x located in?
+-- Assume city x = San Antonio
+select city.name as city_name, country.name
+from city
+join country on city.countrycode = country.code
+where city.name like 'San Antonio';
+
+-- What is the life expectancy in city x?
+-- Assume city x = San Antonio
+select city.name as city_name, LifeExpectancy
+from city
+join country on city.countrycode = country.code
+where city.name like 'San Antonio';
