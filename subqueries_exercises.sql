@@ -19,6 +19,7 @@ where titles.emp_no in (
 )
 order by title
 -- 316 rows affected, 6 unique titles
+-- You can also use DISTINCT title
 
 -- Q3: How many people in the employees table are no longer working for the company?
 select count(emp_no)
@@ -28,6 +29,7 @@ where emp_no in (
 	from dept_emp
 	where to_date != '9999-01-01'
 );
+-- Another way: WHERE column NOT IN ()
 
 -- Q4: Find all the current department managers that are female.
 select first_name, last_name
