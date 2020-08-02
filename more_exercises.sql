@@ -173,3 +173,57 @@ select city.name as city_name, LifeExpectancy
 from city
 join country on city.countrycode = country.code
 where city.name like 'San Antonio';
+
+-- Sakila Database
+-- Q1: Display the first and last names in all lowercase of all the actors.
+select lower(first_name) as first_name, lower(last_name) as last_name
+from actor;
+
+-- Q2: You need to find the ID number, first name, and last name of an actor, of whom you know only the first name, "Joe." 
+-- What is one query would you could use to obtain this information?
+select actor_id as ID_number, first_name, last_name
+from actor
+where first_name = 'Joe';
+
+-- Q3: Find all actors whose last name contain the letters "gen":
+select actor_id, first_name, last_name
+from actor
+where last_name like "%gen%";
+
+-- Q4: Find all actors whose last names contain the letters "li". This time, order the rows by last name and first name, in that order.
+select last_name, first_name
+from actor
+where last_name like "%li%"
+order by last_name, first_name;
+
+-- Q5: Using IN, display the country_id and country columns for the following countries: Afghanistan, Bangladesh, and China
+select country_id, country
+from country 
+where country in ("Afghanistan","Bangladesh","China");
+
+-- Q6: List the last names of all the actors, as well as how many actors have that last name.
+select last_name, count(last_name) 
+from actor
+group by last_name;
+
+-- Q7: ist last names of actors and the number of actors who have that last name, but only for names that are shared by at least two actors
+select last_name, count(last_name) 
+from actor
+group by last_name
+having count(last_name) > 1;
+
+-- Q8: You cannot locate the schema of the address table. Which query would you use to re-create it?
+show create table address;
+describe address;
+
+-- Q9: Use JOIN to display the first and last names, as well as the address, of each staff member.
+select first_name, last_name, address
+from staff
+join address using(address_id);
+
+-- Q10: Use JOIN to display the total amount rung up by each staff member in August of 2005.
+select staff_id, first_name, last_name, sum(amount) 
+from staff
+join payment using(staff_id)
+where payment_date like "%2005-08%"
+group by staff_id;
