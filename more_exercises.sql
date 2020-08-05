@@ -227,3 +227,49 @@ from staff
 join payment using(staff_id)
 where payment_date like "%2005-08%"
 group by staff_id;
+
+-- Q11: List each film and the number of actors who are listed for that film.
+-- Need joiner table film_actor
+select title as film_name, count(actor.actor_id) as number_of_actors
+from actor
+join film_actor as fa on actor.actor_id = fa.actor_id
+join film on fa.film_id = film.film_id
+group by title
+
+-- Q12: How many copies of the film Hunchback Impossible exist in the inventory system?
+-- Need inventory and film tables
+select title, count(title) as number_of_copies
+from inventory
+join film using(film_id)
+where title = "Hunchback Impossible"
+
+-- Q13: The music of Queen and Kris Kristofferson have been an unlikely resurgence. As an unintended consequence, films starting with the letter
+-- K and Q have also soared in popularity. Use subqueries to display the titles of movies starting the letters K and Q whoose language is English.
+-- Tables needed: film and language
+select film_1.title as movie_name
+from (
+    select film.*
+    from film
+    join language using (language_id)
+    where name = "English"
+    and title like "K%"
+    or title like "Q%"
+) as film_1
+
+-- Q14: Use subqueries to display all actors who appear in the film Alone Trip
+select alone_trip.title, concat(first_name, " ", last_name) as name
+from (
+    select title, actor_id
+    from film
+    join film_actor using(film_id)
+    where title = "Alone Trip"
+) as alone_trip
+join actor using(actor_id)
+
+-- Q15: You want to run an email marketing campaign in Canada, for which you will need the names and email addresses of all Canadian customers
+select concat(first_name, " ", last_name) as full_name, email
+from customer
+join address using(address_id)
+join city using(city_id)
+join country using(country_id)
+where country = "Canada"
