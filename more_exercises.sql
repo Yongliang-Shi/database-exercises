@@ -273,3 +273,77 @@ join address using(address_id)
 join city using(city_id)
 join country using(country_id)
 where country = "Canada"
+
+-- Q16: Sales have been lagging among young families, and you wish to target all family movies for a promotion. Identify all movies categorized as famiy films.
+
+select film.*
+from (
+    select film_id, name
+    from film_category
+    join category using(category_id)
+    where name = "Family"
+) as family_movies_id
+join film using(film_id)
+-- output: 69 rows
+
+select film.*
+from film_category
+join category using(category_id)
+join film using(film_id)
+where name = "Family"
+-- output: 69 rows
+
+-- Q17: Write a query to display how much business, in dollars, each store brought in.
+
+select store_id, sum(amount)
+from store
+join customer using(store_id)
+join payment using(customer_id)
+group by store_id;
+
+-- output: 
+    -- 1        37001.52
+    -- 2        30414.99
+    -- Total    67416.51    
+
+select store_id, sum(amount)
+from store
+join inventory using(store_id)
+join rental using(inventory_id)
+join payment using(rental_id)
+group by store_id;
+
+-- output:
+    -- 1:       33679.79
+    -- 2:       33726.77
+    -- Total:   67406.56
+
+-- ? How to add antother row total   
+
+-- Q18: Write a query to display for each store its store ID, city, and country.
+
+select store_id, city, country
+from store
+join address using(address_id)
+join city using(city_id)
+join country using(country_id)
+
+-- output:
+    -- 1    Lethbridge  Canada
+    -- 2    Woodridge   Australia
+
+-- Q19: List the top five genres in gross revenue in descending order. 
+-- (Hint: you may need to use the following tables: category, film_category, inventory, payment, and rental.)
+
+select name, sum(amount) as gross_revenue
+from category 
+join film_category using(category_id)
+join film using(film_id)
+join inventory using(film_id)
+join rental using(inventory_id)
+join payment using(rental_id)
+group by category_id
+order by gross_revenue desc
+limit 5;
+
+-- output: total: 67406.56
